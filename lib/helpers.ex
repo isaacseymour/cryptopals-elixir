@@ -32,7 +32,10 @@ defmodule Helpers do
   }
 
   def decode_hex(string) do
-    string |> String.upcase |> Base.decode16! |> :binary.bin_to_list
+    string
+    |> String.upcase
+    |> Base.decode16!
+    |> :binary.bin_to_list
   end
 
   def encode_hex(bytes) do
