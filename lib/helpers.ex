@@ -49,4 +49,10 @@ defmodule Helpers do
     |> Enum.map(fn (char) -> Map.get(@frequency_map, char, 0) end)
     |> Enum.sum
   end
+
+  def pmap(enum, func) do
+    enum
+    |> Enum.map(&(Task.async(fn -> func.(&1) end)))
+    |> Enum.map(&Task.await/1)
+  end
 end

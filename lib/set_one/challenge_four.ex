@@ -1,5 +1,4 @@
 defmodule SetOne.ChallengeFour do
-
   def find_line(path) do
     File.stream!(path)
     |> Enum.map(&String.strip/1)

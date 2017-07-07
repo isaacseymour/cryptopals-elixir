@@ -4,9 +4,13 @@ defmodule SetOne.ChallengeThree do
 
   def decode(ciphertext) do
     cipherbytes = decode_hex(ciphertext)
+    decode_bytes(cipherbytes)
+  end
+
+  def decode_bytes(cipherbytes) do
     key = 0..255 |> Enum.max_by(fn key -> score_key(cipherbytes, key) end)
 
-     {decode_for_key(cipherbytes, key), score_key(cipherbytes, key), key}
+    {decode_for_key(cipherbytes, key), score_key(cipherbytes, key), key}
   end
 
   defp score_key(cipherbytes, key) do
