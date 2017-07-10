@@ -102,29 +102,29 @@ defmodule AES do
     |> Enum.map(fn {byte, keybyte} -> bxor(byte, keybyte) end)
   end
 
-  # Must be 16 bytes
-  def encrypt(bytes, keybytes) do
-    # We want the key expanded as a list of 4-byte _words_
-    expanded_key = AESKeyExpansion.expand(keybytes) |> Enum.chunk(4)
-
-    state = bytes |> add_round_key(expanded_key |> Enum.take(1) |> List.flatten)
-
-    thing = 1..9
-    |> Enum.zip(Enum.drop(expanded_key, 1))
-    |> Enum.reduce(state, fn {_round, round_key}, acc ->
-      acc
-      |> sub_bytes
-      |> shift_rows
-      |> mix_columns
-      |> add_round_key(round_key |> List.flatten)
-    end)
-
-    final_round_key = Enum.drop(expanded_key, 10) |> List.flatten
-
-    thing
+  defp encrypt_round(state, [round_key]) do
+    state
     |> sub_bytes
     |> shift_rows
-    |> add_round_key(final_round_key)
+    |> add_round_key(round_key)
+  end
+  defp encrypt_round(state, [round_key | remaining_round_keys]) do
+    state
+    |> sub_bytes
+    |> shift_rows
+    |> mix_columns
+    |> add_round_key(round_key)
+    |> encrypt_round(remaining_round_keys)
+  end
+
+  # Must be 16 bytes
+  def encrypt(bytes, keybytes) do
+    # We want the key expanded as a list of 16-byte keys, not 4-byte words
+    [round_key | round_keys] = AESKeyExpansion.expand(keybytes) |> Enum.chunk(4) |> Enum.map(&List.flatten/1)
+
+    bytes
+    |> add_round_key(round_key)
+    |> encrypt_round(round_keys)
   end
 
   defp unzip_rows(rows) do
