@@ -34,7 +34,7 @@ defmodule SetOne.ChallengeSix do
   end
 
   def guess_for_keysize(keysize, cipherbytes) do
-    key = cipherbytes
+    cipherbytes
     |> Enum.chunk(keysize)
     |> Enum.zip
     |> Enum.map(&Tuple.to_list/1)
