@@ -1,17 +1,17 @@
-defmodule AESKeyExpansionTest do
+defmodule AES.KeyExpansionTest do
   use ExUnit.Case, async: true
-  import AESKeyExpansion
+  import AES.KeyExpansion
 
   test "is the right length" do
     key = 1..16
     # need 44 words. four for each round of add_round_key, and there are ten rounds, plus an initial
     # application
-    assert Enum.count(expand(key)) == 44
+    assert Enum.count(expand_key(key)) == 44
   end
 
   test "completes the example correctly" do
     key = Helpers.decode_hex("2b7e151628aed2a6abf7158809cf4f3c")
-    expanded = expand(key)
+    expanded = expand_key(key)
     expected = [
       "2b7e1516",
       "28aed2a6",

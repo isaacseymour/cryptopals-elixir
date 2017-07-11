@@ -1,5 +1,6 @@
-defmodule AESKeyExpansion do
+defmodule AES.KeyExpansion do
   use Bitwise
+  import AES.Utils
 
   @rcon [
     0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
@@ -22,17 +23,9 @@ defmodule AESKeyExpansion do
   @nk 4 # Key length for AES-128. 6 for AES-192, 8 for AES-256
   @nr 10 # Number of rounds for AES-128. 12 for AES-192, 14 for AES-256
 
-  def sub_word(word), do: AES.sub_bytes(word)
-
-  def rot_word({bytes, 0}), do: bytes
-  def rot_word({[head | tail], places}) do
-    rot_word({tail ++ [head], places - 1})
-  end
-  def rot_word(word), do: rot_word({word, 1})
-
-  def expand(keybytes) do
+  def expand_key(keybytes) do
     first_words = keybytes |> Enum.chunk(4)
-    1..10 |> Enum.reduce(first_words, fn round, words ->
+    1..@nr |> Enum.reduce(first_words, fn round, words ->
       subbed = sub_word(rot_word(Enum.at(words, -1)))
       rcon = [Enum.at(@rcon, round), 0, 0, 0]
       first_new_word = xor(xor(subbed, rcon), Enum.at(words, -4))
@@ -67,6 +60,4 @@ defmodule AESKeyExpansion do
       expand_iter(words + [new_word], i + 1)
     end
   end
-
-  def xor(bytes1, bytes2), do: Enum.zip(bytes1, bytes2) |> Enum.map(fn {a, b} -> bxor(a, b) end)
 end
