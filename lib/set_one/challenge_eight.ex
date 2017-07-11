@@ -7,6 +7,10 @@ defmodule SetOne.ChallengeEight do
     |> Enum.find_index(&non_unique_chunks?/1)
   end
 
+  def is_ecb?(bytes) do
+    bytes |> Enum.chunk(16) |> non_unique_chunks?
+  end
+
   defp non_unique_chunks?(chunks) do
     num_chunks = chunks |> Enum.count
     num_uniq_chunks = chunks |> Enum.uniq |> Enum.count
